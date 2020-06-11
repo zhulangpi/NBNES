@@ -11,18 +11,7 @@ struct cpu *cpu;
 
 void exec_one_inst(struct cpu *c);
 
-void cpu_init(void)
-{
-    ram = (unsigned char*)malloc(0x800);
-    memset(ram, 0, 0x800);
-    cpu = (struct cpu*)malloc(sizeof(struct cpu));
-    cpu->PC = 0xC000;
-    cpu->P = 0x24;
-    cpu->SP = 0xFD;
-    cpu->A = 0;
-    cpu->X = 0;
-    cpu->Y = 0;
-}
+
 
 
 //addr cpu bus data
@@ -38,8 +27,10 @@ unsigned char cpu_addr(unsigned short addr, unsigned char in, int dir)
        // if(addr==0)
         //printf("%s: %x %x\n", (dir==CPU_RD)?"read":"write", addr, ram[addr]);
         return ram[addr];
+    }else if( addr<0x4000 ){    //IO Register
+        addr &= 0x2007;
+
     }else if( addr<0x4020 ){    //IO Register
-        addr -= 0x2000;
 
     }else if( addr<0x6000 ){    //Expansion ROM
         addr -= 0x4020;
@@ -49,9 +40,11 @@ unsigned char cpu_addr(unsigned short addr, unsigned char in, int dir)
 
     }else if( addr<0x10000 ){   //PRG-ROM
         addr -= 0x8000;
+
         if(addr>=0x4000){
             addr-=0x4000;
         }
+
         if(dir==CPU_WRT){
             prg_rom[addr] = in;
         }
@@ -60,6 +53,26 @@ unsigned char cpu_addr(unsigned short addr, unsigned char in, int dir)
 
     return 0;
 }
+
+
+void cpu_init(void)
+{
+    ram = (unsigned char*)malloc(0x800);
+    memset(ram, 0, 0x800);
+    cpu = (struct cpu*)malloc(sizeof(struct cpu));
+    //cpu->PC = 0;
+    cpu->PC = cpu_addr(RESET_VEC, 0, CPU_RD) |(cpu_addr(RESET_VEC+1, 0, CPU_RD)<<8);
+    //cpu->PC = cpu_addr(NMI_VEC, 0, CPU_RD) |(cpu_addr(NMI_VEC+1, 0, CPU_RD)<<8);
+    cpu->P = 0x34;
+    cpu->SP = 0xFD;
+    cpu->A = 0;
+    cpu->X = 0;
+    cpu->Y = 0;
+    printf("NMI_VEC:%#x\n", cpu_addr(NMI_VEC, 0, CPU_RD) |(cpu_addr(NMI_VEC+1, 0, CPU_RD)<<8));
+    printf("RESET_VEC:%#x\n", cpu_addr(RESET_VEC, 0, CPU_RD) |(cpu_addr(RESET_VEC+1, 0, CPU_RD)<<8));
+    printf("IRQ_VEC:%#x\n", cpu_addr(IRQ_VEC, 0, CPU_RD) |(cpu_addr(IRQ_VEC+1, 0, CPU_RD)<<8));
+}
+
 
 void push(struct cpu *c, unsigned char m)
 {
@@ -735,7 +748,7 @@ void exec_one_inst(struct cpu *c)
         SET_B(c->P);
         SET_U(c->P);
         push(c, c->P | BITMASK_U | BITMASK_B );
-        c->PC = IRQ_VEC;
+        c->PC = cpu_addr(IRQ_VEC, 0, CPU_RD) |(cpu_addr(IRQ_VEC+1, 0, CPU_RD)<<8);
         SET_I(c->P);
         break;
     case 0x01:  //ORA izx 6

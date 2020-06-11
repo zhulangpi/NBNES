@@ -22,8 +22,8 @@ struct instruction{
 
 #define STACK_BASE  (0x100)
 
-#define RESET_VEC   (0xFFFA)
-#define NMI_VEC     (0xFFFC)
+#define NMI_VEC     (0xFFFA)
+#define RESET_VEC   (0xFFFC)
 #define IRQ_VEC     (0xFFFE)
 
 /*

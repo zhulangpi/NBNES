@@ -5,9 +5,10 @@
 
 int main(int argc, char* argv[])
 {
-    int i = 9000;
+    int i = 50;
 
     if(load_rom("nestest.nes")<0){
+//    if(load_rom("Donkey_Kong.nes")<0){
         printf("error: load nes file failed\n");
     }
     cpu_init();

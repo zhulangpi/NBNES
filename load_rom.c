@@ -26,11 +26,13 @@ int load_rom(char* nes_file)
     offset = sizeof(struct ines_header);
     if(have_trainer(i_h->f6)){
         offset += TRAINER_SZ;
+        printf("Have trainer\n");
     }
 
     prg_sz = i_h->prg_rom_sz << (4+10);
     chr_sz = i_h->chr_rom_sz << (3+10);
 
+    printf("prg_sz:%#x chr_sz:%#x\n", prg_sz, chr_sz);
     prg_rom = (char*)malloc(prg_sz);
     chr_rom = (char*)malloc(chr_sz);
     if(!(prg_rom && chr_rom)){
@@ -43,6 +45,7 @@ int load_rom(char* nes_file)
     fseek(f, offset + prg_sz, SEEK_SET);
     fread(chr_rom, sizeof(char), chr_sz, f);
     fclose(f);
+    printf("prg_rom[0]:%#x chr_rom[0]:%#x\n",prg_rom[0], chr_rom[0]);
     return 0;
 }
 
