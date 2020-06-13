@@ -3,11 +3,10 @@ LD := gcc
 CFLAGS :=
 LDFLAGS :=
 INCLD_DIR := ./
-LIBS := -lSDL2
 
-OBJS := main.o load_rom.o cpu.o ppu.o sdl.o
+OBJS := main.o load_rom.o cpu.o ppu.o display.o
 all: $(OBJS)
-	$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o a.out
+	$(LD) $(LDFLAGS) $(OBJS) -o a.out
 
 %.o : %.c
 	$(CC) $(CFLAGS) -I$(INCLD_DIR) $< -c -o $@

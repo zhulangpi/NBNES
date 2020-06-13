@@ -5,8 +5,8 @@
 #define INES_MAGIC  0x1a53454e  // 'N' 'E' 'S' 0x1A
 struct ines_header{
     unsigned int  magic_num;
-    char prg_rom_sz;    //in 16KB units
-    char chr_rom_sz;    //in 8KB units
+    char prg_rom_sz;        //in 16KB units
+    char pattern_tbl_sz;    //in 8KB units
     char f6;
     char f7;
     char padding[8];

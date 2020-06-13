@@ -80,7 +80,6 @@ struct instruction{
 
 extern unsigned char *ram;
 extern unsigned char *prg_rom;
-extern unsigned char *chr_rom;
 
 
 extern void cpu_init(void);

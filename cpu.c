@@ -5,7 +5,6 @@
 
 unsigned char *ram;
 unsigned char *prg_rom;
-unsigned char *chr_rom;
 struct cpu *cpu;
 
 
