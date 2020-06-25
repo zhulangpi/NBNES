@@ -9,7 +9,7 @@
 #include <sys/mman.h>
 
 #include "display.h"
-
+#include "ppu.h"
 
 
 struct rgb888{
@@ -89,10 +89,13 @@ static int lcd_fb_init()
 /* Flush the pixel buffer */
 void nes_flush_buf(void)
 {
-    int x,y,color;
-    color = palette_rgb565[0x0];
-    for (x = 0; x < line_width; x++){
-        for (y = 0; y < var.yres; y++){
+    int x,y,color,idx;
+    for (x = 0; x < WIDTH; x++){
+        for (y = 0; y < HEIGHT; y++){
+            //printf("x:%d y:%d idx:%d ",x, y, x+y*WIDTH);
+            idx = screen_color_idx[x+y*WIDTH];
+            //printf("screen_clr_idx: %d\n",idx);
+            color = palette_rgb565[idx];
             lcd_fb_display_px(color, x, y);
         }
     }
@@ -117,15 +120,10 @@ void display_init(void)
     if(lcd_fb_init()){
         printf("lcd fb init error \n");
         return ;
+    }else{
+        printf("fb init ok\n");
     }
-    nes_flush_buf();
+    //nes_flush_buf();
 }
-
-
-
-
-
-
-
 
 

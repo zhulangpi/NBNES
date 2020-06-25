@@ -1,6 +1,6 @@
 CC := gcc
 LD := gcc
-CFLAGS :=
+CFLAGS := -fsigned-char
 LDFLAGS :=
 INCLD_DIR := ./
 

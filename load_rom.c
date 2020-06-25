@@ -6,6 +6,8 @@
 #include "load_rom.h"
 
 struct ines_header *i_h;
+unsigned int mapper;
+
 
 int load_rom(char* nes_file)
 {
@@ -31,6 +33,9 @@ int load_rom(char* nes_file)
         offset += TRAINER_SZ;
         printf("Have trainer\n");
     }
+
+    mapper = (i_h->f6 & 0xf0) | (i_h->f7 & 0xf0);
+    printf("mapper:%d\n", mapper);
 
     prg_sz = i_h->prg_rom_sz << (4+10);
     pattern_tbl_sz = i_h->pattern_tbl_sz << (3+10);

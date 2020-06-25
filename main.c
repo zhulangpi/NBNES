@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[])
 {
-    int i = 5;
+    int i,j;
 
     if(load_rom("nestest.nes")<0){
 //    if(load_rom("Donkey_Kong.nes")<0){
@@ -17,9 +17,20 @@ int main(int argc, char* argv[])
 
     display_init();
 
-    while(i--){
-        cpu_run();
-    }
+    j=0;
+    while(1){
+        i = 10000;
+        while(i--){
+            cpu_run();
+            j++;
+
+            if(j >= 8000)
+                return 0;
+        }
+        //do_vblank();
+        //bg_render();
+        //nes_flush_buf();
+    };
 
     return 0;
 }
