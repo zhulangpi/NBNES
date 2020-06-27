@@ -105,4 +105,5 @@ extern void cpu_init(void);
 extern void cpu_reset(void);
 extern void cpu_run(void);
 extern void cpu_NMI(void);
+extern unsigned long cpu_cycle(void);
 #endif

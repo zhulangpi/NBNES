@@ -19,12 +19,18 @@ struct cpu *cpu;
 void exec_one_inst(struct cpu *c);
 
 
+unsigned long cpu_cycle(void)
+{
+    return cpu->cycle;
+}
 
+
+static unsigned char prev_wrt;
+static int p = 10;
 
 //addr cpu bus data
 unsigned char cpu_addr(unsigned short addr, unsigned char in, int rw)
 {
-    unsigned char data;
 
     if( addr<0x2000 ){  //RAM
         addr &= 0x7FF;
@@ -36,9 +42,22 @@ unsigned char cpu_addr(unsigned short addr, unsigned char in, int rw)
         return ram[addr];
 
     }else if( addr<0x4000 ){    //IO Register
-        return ppu_reg_rw(addr, data, rw);
+        //printf("%s: %x \n", (rw==CPU_RD)?"read":"write", addr);
+        return ppu_reg_rw(addr, in, rw);
 
     }else if( addr<0x4020 ){    //IO Register
+        if(addr == 4016){
+            if(rw==CPU_RD){
+                if(p++ < 9){
+                    return joy_state(p);
+                }
+            }else if(rw==CPU_WRT){
+                if( (data&1)==0  && prev_wrt == 1){
+                    p = 0;
+                }
+                prev_wrt = data & 1;
+            }
+        }
 
     }else if( addr<0x6000 ){    //Expansion ROM
         addr -= 0x4020;
@@ -88,7 +107,6 @@ void cpu_init(void)
     printf("RESET_VEC:%#x\n", cpu_read16(RESET_VEC));
     printf("IRQ_VEC:%#x\n", cpu_read16(IRQ_VEC));
     cpu_reset();
-    cpu->PC = 0xC000;
 }
 
 
@@ -108,7 +126,7 @@ unsigned char pop(struct cpu *c)
 void print_cpu(struct cpu* c)
 {
     static int i= 0;
-    printf("%4d: A:%2x X:%2x Y:%2x P:%2x SP:%2x ",++i, c->A, c->X, c->Y, c->P, c->SP );
+    printf("%4d: A:%2x X:%2x Y:%2x P:%2x SP:%2x ",i++, c->A, c->X, c->Y, c->P, c->SP );
 }
 
 void cpu_run(void)
@@ -585,8 +603,6 @@ int inst_izy(struct instruction *inst, struct cpu *c, unsigned char (*f)(unsigne
     c->PC+=2;
     return diff_page(old_addr, addr);
 }
-
-
 
 
 void exec_one_inst(struct cpu *c)

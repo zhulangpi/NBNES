@@ -95,7 +95,7 @@ void nes_flush_buf(void)
             //printf("x:%d y:%d idx:%d ",x, y, x+y*WIDTH);
             idx = screen_color_idx[x+y*WIDTH];
             //printf("screen_clr_idx: %d\n",idx);
-            color = palette_rgb565[idx];
+            color = palette_rgb565[image_palette[idx]];
             lcd_fb_display_px(color, x, y);
         }
     }

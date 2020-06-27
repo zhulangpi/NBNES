@@ -26,6 +26,7 @@
 
 #define VRAM_INC        (0x04)
 #define VBlank          (0x80)
+#define Sprite_0_hit    (0x40)
 
 
 
@@ -47,10 +48,6 @@
 
 // the color of each pixel is indexed by 4 bits,
 // so each pixel can have 2^4 = 16 colors, if they use the same Attr tbl element
-
-
-
-
 
 
 struct chr{
@@ -77,6 +74,9 @@ struct bg_tbl{
 extern struct pattern_tbl *pattern_tbl0;
 extern struct pattern_tbl *pattern_tbl1;
 extern struct bg_tbl   *bg[4];
+extern unsigned char image_palette[0x10];
+extern unsigned char sprite_palette[0x10];
+
 
 extern unsigned int screen_color_idx[WIDTH*HEIGHT];
 
@@ -89,4 +89,5 @@ extern void ppu_init(void);
 extern void bg_render(void);
 extern unsigned char ppu_reg_rw(unsigned short, unsigned char, int);
 extern void do_vblank(void);
+extern void ppu_run(void);
 #endif
