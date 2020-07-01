@@ -3,8 +3,9 @@
 #include <string.h>
 #include "cpu.h"
 #include "ppu.h"
+#include "input.h"
 
-#define DEBUG
+//#define DEBUG
 
 #define cpu_read16(addr)        ( cpu_addr(addr, 0, CPU_RD) |(cpu_addr(addr+1, 0, CPU_RD)<<8) )
 
@@ -27,38 +28,37 @@ unsigned long cpu_cycle(void)
 
 static unsigned char prev_wrt;
 static int p = 10;
-
 //addr cpu bus data
-unsigned char cpu_addr(unsigned short addr, unsigned char in, int rw)
+unsigned char cpu_addr(unsigned short addr, unsigned char data, int rw)
 {
+    //printf("CPU: %s: %#x \n", (rw==CPU_RD)?"read":"write", addr);
 
     if( addr<0x2000 ){  //RAM
         addr &= 0x7FF;
         if(rw==CPU_WRT){
-            ram[addr] = in;
+            ram[addr] = data;
         }
        // if(addr==0)
         //printf("%s: %x %x\n", (dir==CPU_RD)?"read":"write", addr, ram[addr]);
         return ram[addr];
-
     }else if( addr<0x4000 ){    //IO Register
         //printf("%s: %x \n", (rw==CPU_RD)?"read":"write", addr);
-        return ppu_reg_rw(addr, in, rw);
-
+        return ppu_reg_rw(addr, data, rw);
     }else if( addr<0x4020 ){    //IO Register
-        if(addr == 4016){
-            if(rw==CPU_RD){
+        if(rw==CPU_RD){
+            if(addr == 0x4016){
                 if(p++ < 9){
-                    return joy_state(p);
+                    return js_state(p);
                 }
-            }else if(rw==CPU_WRT){
-                if( (data&1)==0  && prev_wrt == 1){
+            }
+        }else if(rw==CPU_WRT){
+            if(addr == 0x4016){
+                if( ((data&1)==0)  && (prev_wrt == 1)){
                     p = 0;
                 }
-                prev_wrt = data & 1;
             }
+            prev_wrt = data & 1;
         }
-
     }else if( addr<0x6000 ){    //Expansion ROM
         addr -= 0x4020;
 
@@ -68,12 +68,8 @@ unsigned char cpu_addr(unsigned short addr, unsigned char in, int rw)
     }else if( addr<0x10000 ){   //PRG-ROM
         addr -= 0x8000;
 
-        if(addr>=0x4000){
-            addr-=0x4000;
-        }
-
         if(rw==CPU_WRT){
-            prg_rom[addr] = in;
+            prg_rom[addr] = data;
         }
         return prg_rom[addr];
     }
@@ -1814,9 +1810,4 @@ void exec_one_inst(struct cpu *c)
 
 
 }
-
-
-
-
-
 

@@ -6,5 +6,5 @@
 
 
 extern void display_init(void);
-extern void nes_flush_buf(void);
+extern void flush_screen(void);
 #endif

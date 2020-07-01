@@ -40,10 +40,10 @@ static int fb_fd;
 static unsigned char *fb_mem;
 static int px_width;
 static int line_width;
-static int screen_width;
+static int screen_sz;
 static struct fb_var_screeninfo var;
 
-static int lcd_fb_display_px(unsigned short color, int x, int y)
+static int fb_display_px(unsigned short color, int x, int y)
 {
     unsigned char  *pen8;
     unsigned short *pen16;
@@ -59,7 +59,7 @@ static int lcd_fb_display_px(unsigned short color, int x, int y)
 
 
 
-static int lcd_fb_init()
+static int fb_init()
 {
     fb_fd = open("/dev/fb0", O_RDWR);
     if(fb_fd < 0){
@@ -73,21 +73,21 @@ static int lcd_fb_init()
     }
     px_width = var.bits_per_pixel / 8;
     line_width = var.xres * px_width;
-    screen_width = var.yres * line_width;
+    screen_sz = var.yres * line_width;
 
-    fb_mem = (unsigned char *)mmap(NULL, screen_width, PROT_READ | PROT_WRITE, MAP_SHARED, fb_fd, 0);
+    fb_mem = (unsigned char *)mmap(NULL, screen_sz, PROT_READ | PROT_WRITE, MAP_SHARED, fb_fd, 0);
     if(!fb_mem){
         close(fb_fd);
         printf("cat't mmap /dev/fb0 \n");
         return -1;
     }
-    memset(fb_mem, 0 , screen_width);
+    memset(fb_mem, 0 , screen_sz);
     return 0;
 }
 
 
 /* Flush the pixel buffer */
-void nes_flush_buf(void)
+void flush_screen(void)
 {
     int x,y,color,idx;
     for (x = 0; x < WIDTH; x++){
@@ -96,7 +96,7 @@ void nes_flush_buf(void)
             idx = screen_color_idx[x+y*WIDTH];
             //printf("screen_clr_idx: %d\n",idx);
             color = palette_rgb565[image_palette[idx]];
-            lcd_fb_display_px(color, x, y);
+            fb_display_px(color, x, y);
         }
     }
 }
@@ -117,13 +117,12 @@ static void palette_init(void)
 void display_init(void)
 {
     palette_init();
-    if(lcd_fb_init()){
-        printf("lcd fb init error \n");
+    if(fb_init()){
+        printf("fb init error \n");
         return ;
     }else{
         printf("fb init ok\n");
     }
-    //nes_flush_buf();
 }
 
 

@@ -41,7 +41,7 @@ int load_rom(char* nes_file)
     pattern_tbl_sz = i_h->pattern_tbl_sz << (3+10);
     printf("prg_sz:%#x pattern_tbl_sz:%#x\n", prg_sz, pattern_tbl_sz);
 
-    prg_rom = (unsigned char*)malloc(prg_sz);
+    prg_rom = (unsigned char*)malloc(0x8000);
 
     pattern_tbl0 = (struct pattern_tbl*)malloc(sizeof(struct pattern_tbl));
     if(pattern_tbl_sz > sizeof(struct pattern_tbl)){
@@ -54,6 +54,9 @@ int load_rom(char* nes_file)
     
     fseek(f, offset, SEEK_SET);
     fread(prg_rom, sizeof(char), prg_sz, f);
+    if(prg_sz<=0x4000){
+        memcpy(prg_rom + 0x4000, prg_rom, 0x4000);
+    }
     fseek(f, offset + prg_sz, SEEK_SET);
     fread(pattern_tbl0, sizeof(char), pattern_tbl_sz, f);
     if(pattern_tbl_sz > sizeof(struct pattern_tbl)){
@@ -62,7 +65,6 @@ int load_rom(char* nes_file)
     }
 
     fclose(f);
-    printf("prg_rom[0]:%#x pattern_tbl[0]:%#x\n",prg_rom[0], ((unsigned char*)pattern_tbl0)[0x32-0x10]);
 
     return 0;
 }

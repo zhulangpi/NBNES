@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include <unistd.h>
 #include "load_rom.h"
 #include "cpu.h"
 #include "ppu.h"
 #include "display.h"
+#include "input.h"
 
 extern void p_pal(void);
 
@@ -21,25 +23,33 @@ int main(int argc, char* argv[])
 {
     int i,j;
 
-    if(load_rom("nestest.nes")<0){
+//    if(load_rom("nestest.nes")<0){
+    if(load_rom("color_test.nes")<0){
 //    if(load_rom("Donkey_Kong.nes")<0){
         printf("error: load nes file failed\n");
     }
     cpu_init();
     ppu_init();
+    js_init();
     display_init();
-
+/*
+    while(1){
+        js_state(0);
+        sleep(1);
+    };
+    */
     while(1){
         i = cpu_cycle();
         ppu_run();
         while((cpu_cycle()-i) < (1364/12)){
             cpu_run();
             j++;
-            if(j>=40000){
-                p_pal();
-                p_pat();
+            /*
+            if(j>=300000){
+                //p_pal();
+                //p_pat();
                 return 0;
-            }
+            }*/
         }
     };
 

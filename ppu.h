@@ -9,7 +9,7 @@
 #define BLK_PER_ROW     (16)
 #define BLK_PER_COL     (15)
 
-#define PPUBASE         (0x2000)
+#define PPU_REG_BASE         (0x2000)
 #define PPUCTRL         (0)
 #define PPUMASK         (1)
 #define PPUSTATUS       (2)
@@ -27,7 +27,6 @@
 #define VRAM_INC        (0x04)
 #define VBlank          (0x80)
 #define Sprite_0_hit    (0x40)
-
 
 
 // FROM: http://wiki.nesdev.com/w/index.php/PPU
@@ -68,9 +67,6 @@ struct bg_tbl{
 };
 
 
-
-
-
 extern struct pattern_tbl *pattern_tbl0;
 extern struct pattern_tbl *pattern_tbl1;
 extern struct bg_tbl   *bg[4];
@@ -81,7 +77,6 @@ extern unsigned char sprite_palette[0x10];
 extern unsigned int screen_color_idx[WIDTH*HEIGHT];
 
 
-extern unsigned char ppu_reg[PPU_REG_MAX];
 extern unsigned char ppu_reg_OAMDMA;
 
 
